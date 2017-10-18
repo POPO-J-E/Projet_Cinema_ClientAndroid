@@ -1,6 +1,7 @@
 package ddsociety.com.projet_cinema_clientmobile.model;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -70,5 +71,10 @@ public class Film implements Serializable{
 
     public void setCategorie(Categorie categorie) {
         this.categorie = categorie;
+    }
+
+    public String getInfos()
+    {
+        return String.format("%s, %d min", (new SimpleDateFormat("yyyy")).format(getDateSortie()), getDuree());
     }
 }

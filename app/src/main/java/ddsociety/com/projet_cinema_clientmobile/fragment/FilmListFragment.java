@@ -9,12 +9,15 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import ddsociety.com.projet_cinema_clientmobile.R;
 import ddsociety.com.projet_cinema_clientmobile.api.utils.PaginatedResponse;
+import ddsociety.com.projet_cinema_clientmobile.model.Categorie;
 import ddsociety.com.projet_cinema_clientmobile.model.Film;
 import ddsociety.com.projet_cinema_clientmobile.model.list.FilmList;
 import ddsociety.com.projet_cinema_clientmobile.service.CinemaService;
@@ -35,12 +38,15 @@ public class FilmListFragment extends Fragment {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
+    private static final String ARG_CATEGORIE = "categorie";
     private static final String ARG_FILMS = "films";
     // TODO: Customize parameters
     private int mColumnCount = 1;
+    private Categorie categorie;
     private List<Film> films;
     private OnListFragmentInteractionListener mListener;
     private FilmListRecyclerViewAdapter recyclerViewAdapter;
+    private RecyclerView recyclerView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -49,12 +55,19 @@ public class FilmListFragment extends Fragment {
     public FilmListFragment() {
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static FilmListFragment newInstance(int columnCount) {
+    public static FilmListFragment newInstance(Categorie categorie) {
+        return newInstance(1, categorie);
+    }
+
+    public static FilmListFragment newInstance() {
+        return newInstance(1, null);
+    }
+
+    public static FilmListFragment newInstance(int columnCount, Categorie categorie) {
         FilmListFragment fragment = new FilmListFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putSerializable(ARG_CATEGORIE, categorie);
         fragment.setArguments(args);
         return fragment;
     }
@@ -65,6 +78,7 @@ public class FilmListFragment extends Fragment {
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            categorie = (Categorie) getArguments().getSerializable(ARG_CATEGORIE);
         }
     }
 
@@ -86,9 +100,12 @@ public class FilmListFragment extends Fragment {
 
         // Create a very simple REST adapter which points the GitHub API endpoint.
         CinemaService cinemaService =  retrofit.create(CinemaService.class);
-
+        Call<PaginatedResponse<FilmList>> call;
         // Fetch a list of the Github repositories.
-        Call<PaginatedResponse<FilmList>> call = cinemaService.listFilms();
+        if(categorie != null)
+            call = cinemaService.listFilmsByCategorie(categorie.getCodeCat());
+        else
+            call = cinemaService.listFilms();
 
         // Execute the call asynchronously. Get a positive or negative callback.
         call.enqueue(new Callback<PaginatedResponse<FilmList>>() {
@@ -115,39 +132,40 @@ public class FilmListFragment extends Fragment {
 
     public void afficherFilms(List<Film> films) {
         this.films = films;
-        this.recyclerViewAdapter.notifyDataSetChanged();
+        if(getArguments() != null)
+        {
+            this.getArguments().putSerializable(ARG_FILMS, (Serializable) this.films);
+        }
+//        this.recyclerViewAdapter.notifyDataSetChanged();
+        recyclerViewAdapter = new FilmListRecyclerViewAdapter(this.films, mListener);
+        recyclerView.setAdapter(recyclerViewAdapter);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_film_list, container, false);
+        TextView titleView = (TextView) view.findViewById(R.id.list_title);
+        titleView.setText((categorie != null) ? categorie.getLibelleCat() : "Dernier films ajoutés");
 
+        View rView = view.findViewById(R.id.film_list);
         // Set the adapter
-        if (view instanceof RecyclerView) {
-            boolean filmsLoaded = false;
+        if (rView instanceof RecyclerView) {
+            Context context = view.getContext();
+            recyclerView = (RecyclerView) rView;
+            if (mColumnCount <= 1) {
+                recyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+            } else {
+                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+            }
+
             if (getArguments() != null && savedInstanceState != null)
             {
-                films = (List<Film>)getArguments().getSerializable(ARG_FILMS);
-                filmsLoaded = true;
+                afficherFilms((List<Film>)getArguments().getSerializable(ARG_FILMS));
             }
             else
             {
                 films = new ArrayList<>();
-            }
-
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
-            recyclerViewAdapter = new FilmListRecyclerViewAdapter(this.films, mListener);
-            recyclerView.setAdapter(recyclerViewAdapter);
-
-            if (!filmsLoaded)
-            {
                 loadFilms();
             }
         }
@@ -185,5 +203,28 @@ public class FilmListFragment extends Fragment {
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
         void onListFragmentInteraction(Film film);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        System.out.println("on resume");
+        // Set title
+        updateTitle();
+    }
+
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser) {
+            // Set title
+            updateTitle();
+        }
+    }
+
+    public void updateTitle()
+    {
+        if(getActivity().getActionBar() != null)
+            getActivity().getActionBar()
+                    .setTitle(R.string.app_name);
     }
 }

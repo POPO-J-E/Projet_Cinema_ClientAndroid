@@ -1,24 +1,31 @@
 package ddsociety.com.projet_cinema_clientmobile;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import ddsociety.com.projet_cinema_clientmobile.fragment.FilmFragment;
 import ddsociety.com.projet_cinema_clientmobile.fragment.FilmListFragment;
+import ddsociety.com.projet_cinema_clientmobile.fragment.HomeFragment;
 import ddsociety.com.projet_cinema_clientmobile.model.Film;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, FilmListFragment.OnListFragmentInteractionListener
+        implements NavigationView.OnNavigationItemSelectedListener,
+        FilmListFragment.OnListFragmentInteractionListener,
+        FilmFragment.OnFragmentInteractionListener
 {
 
     @Override
@@ -46,16 +53,16 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-//        afficherFilms();
+        afficherHome();
     }
 
-    public void afficherFilms() {
-        Fragment frg = new FilmListFragment();
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.content_main_container, frg, "fragment_list_film")
-                .disallowAddToBackStack()
-                .commit();
+    public void afficherHome() {
+        HomeFragment fragment = HomeFragment.newInstance();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right, R.anim.enter_from_right, R.anim.exit_to_left);
+        transaction.add(R.id.fragment_container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     @Override
@@ -64,7 +71,14 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            FragmentManager fm = getFragmentManager();
+            if (fm.getBackStackEntryCount() > 0) {
+                Log.i("MainActivity", "popping backstack");
+                fm.popBackStack();
+            } else {
+                Log.i("MainActivity", "nothing on backstack, calling super");
+                super.onBackPressed();
+            }
         }
     }
 
@@ -118,5 +132,37 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onListFragmentInteraction(Film film) {
         System.out.println("click "+film.getTitre());
+        // Create fragment and give it an argument specifying the article it should show
+        FilmFragment newFragment = FilmFragment.newInstance(film);
+
+        replaceFragmentWithAnimation(newFragment, false);
+        getSupportActionBar().setTitle(film.getTitre());
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public void onFragmentBackInteraction() {
+        this.onBackPressed();
+        getSupportActionBar().setTitle(R.string.app_name);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+    }
+
+    public void replaceFragmentWithAnimation(Fragment fragment, boolean back){
+        replaceFragmentWithAnimation(fragment, null, back);
+    }
+
+    public void replaceFragmentWithAnimation(Fragment fragment, String tag, boolean back){
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if(back)
+        {
+            transaction.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right, R.anim.enter_from_right, R.anim.exit_to_left);
+        }
+        else
+        {
+            transaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right);
+        }
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.addToBackStack(tag);
+        transaction.commit();
     }
 }

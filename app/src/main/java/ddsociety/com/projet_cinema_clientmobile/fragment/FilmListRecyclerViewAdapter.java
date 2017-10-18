@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.text.DateFormat;
 import java.util.List;
 
 import ddsociety.com.projet_cinema_clientmobile.R;
@@ -39,8 +38,8 @@ public class FilmListRecyclerViewAdapter extends RecyclerView.Adapter<FilmListRe
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.film = films.get(position);
         holder.titreView.setText(films.get(position).getTitre());
-        holder.sortieView.setText(DateFormat.getDateInstance().format(films.get(position).getDateSortie()));
-        System.out.println("bind "+holder.film.getTitre());
+        holder.infosView.setText(films.get(position).getInfos());
+
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,14 +60,14 @@ public class FilmListRecyclerViewAdapter extends RecyclerView.Adapter<FilmListRe
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final TextView titreView;
-        public final TextView sortieView;
+        public final TextView infosView;
         public Film film;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            titreView = (TextView) view.findViewById(R.id.film_titre);
-            sortieView = (TextView) view.findViewById(R.id.film_sortie);
+            titreView = view.findViewById(R.id.film_titre);
+            infosView = view.findViewById(R.id.film_infos);
         }
 
         @Override
