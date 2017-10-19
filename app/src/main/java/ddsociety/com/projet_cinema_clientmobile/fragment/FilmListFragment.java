@@ -204,27 +204,4 @@ public class FilmListFragment extends Fragment {
         // TODO: Update argument type and name
         void onListFragmentInteraction(Film film);
     }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        System.out.println("on resume");
-        // Set title
-        updateTitle();
-    }
-
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if(isVisibleToUser) {
-            // Set title
-            updateTitle();
-        }
-    }
-
-    public void updateTitle()
-    {
-        if(getActivity().getActionBar() != null)
-            getActivity().getActionBar()
-                    .setTitle(R.string.app_name);
-    }
 }

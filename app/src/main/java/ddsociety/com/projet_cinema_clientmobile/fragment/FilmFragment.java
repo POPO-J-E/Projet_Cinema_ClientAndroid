@@ -10,6 +10,13 @@ import android.widget.TextView;
 
 import ddsociety.com.projet_cinema_clientmobile.R;
 import ddsociety.com.projet_cinema_clientmobile.model.Film;
+import ddsociety.com.projet_cinema_clientmobile.service.CinemaService;
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,9 +31,11 @@ public class FilmFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_FILM = "film";
     // TODO: Rename and change types of parameters
+    private int noFilm;
     private Film film;
 
     private OnFragmentInteractionListener mListener;
+    private View view;
 
     public FilmFragment() {
         // Required empty public constructor
@@ -41,9 +50,14 @@ public class FilmFragment extends Fragment {
      */
     // TODO: Rename and change types and number of parameters
     public static FilmFragment newInstance(Film film) {
+        return newInstance(film.getNoFilm());
+    }
+
+    // TODO: Rename and change types and number of parameters
+    public static FilmFragment newInstance(int film) {
         FilmFragment fragment = new FilmFragment();
         Bundle args = new Bundle();
-        args.putSerializable(ARG_FILM, film);
+        args.putInt(ARG_FILM, film);
         fragment.setArguments(args);
         return fragment;
     }
@@ -51,21 +65,73 @@ public class FilmFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            film = (Film)getArguments().getSerializable(ARG_FILM);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_film, container, false);
+        view = inflater.inflate(R.layout.fragment_film, container, false);
+
+        if (getArguments() != null) {
+            noFilm = getArguments().getInt(ARG_FILM);
+
+            loadFilm();
+        }
+
+        return view;
+    }
+
+    private void loadFilm() {
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        Retrofit.Builder builder =
+                new Retrofit.Builder()
+                        .baseUrl(CinemaService.ENDPOINT)
+                        .addConverterFactory(
+                                GsonConverterFactory.create()
+                        );
+        Retrofit retrofit =
+                builder
+                        .client(
+                                httpClient.build()
+                        )
+                        .build();
+
+        // Create a very simple REST adapter which points the GitHub API endpoint.
+        CinemaService cinemaService =  retrofit.create(CinemaService.class);
+        Call<Film> call;
+        call = cinemaService.getFilm(noFilm);
+
+        // Execute the call asynchronously. Get a positive or negative callback.
+        call.enqueue(new Callback<Film>() {
+
+            @Override
+            public void onResponse(Call<Film> call, Response<Film> response) {
+                Film film = response.body();
+
+                if(film != null)
+                {
+                    afficherFilm(film);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Film> call, Throwable t) {
+                System.out.println("fail");
+                t.printStackTrace();
+                call.cancel();
+            }
+        });
+    }
+
+    public void afficherFilm(Film film)
+    {
+        this.film = film;
+        System.out.println(film.getTitre());
 
         ((TextView)view.findViewById(R.id.film_titre)).setText(film.getTitre());
         ((TextView)view.findViewById(R.id.film_infos)).setText(film.getInfos());
-
-        return view;
+        ((TextView)view.findViewById(R.id.film_categorie)).setText(film.getCategorie().getLibelleCat());
     }
 
     // TODO: Rename method, update argument and hook method into UI event
