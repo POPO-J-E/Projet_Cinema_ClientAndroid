@@ -3,6 +3,7 @@ package ddsociety.com.projet_cinema_clientmobile.model;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by kifkif on 12/10/2017.
@@ -15,7 +16,9 @@ public class Film implements Serializable{
     private int montantRecette;
     private String titre;
 
+    private Realisateur realisateur;
     private Categorie categorie;
+    private List<Personnage> personnages;
 
     public int getNoFilm() {
         return noFilm;
@@ -71,6 +74,22 @@ public class Film implements Serializable{
 
     public void setCategorie(Categorie categorie) {
         this.categorie = categorie;
+    }
+
+    public Realisateur getRealisateur() {
+        return realisateur;
+    }
+
+    public void setRealisateur(Realisateur realisateur) {
+        this.realisateur = realisateur;
+    }
+
+    public List<Personnage> getPersonnages() {
+        return personnages;
+    }
+
+    public void setPersonnages(List<Personnage> personnages) {
+        this.personnages = personnages;
     }
 
     public String getInfos()

@@ -10,6 +10,7 @@ import ddsociety.com.projet_cinema_clientmobile.model.list.CategorieList;
 import ddsociety.com.projet_cinema_clientmobile.model.list.FilmList;
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface CinemaService {
@@ -21,10 +22,10 @@ public interface CinemaService {
     Call<PaginatedResponse<FilmList>> listFilms();
 
     @GET("/films/{film}?projection=details")
-    Call<Film> getFilm(@Query("film") Integer film);
+    Call<Film> getFilm(@Path("film") Integer film);
 
     @GET("/films/{film}")
-    Call<Film> getFilm(@Query("film") Integer film, @Query("projection") String projection);
+    Call<Film> getFilm(@Path("film") Integer film, @Query("projection") String projection);
 
     @GET("/films/search/findByCategorie_CodeCat")
     Call<PaginatedResponse<FilmList>> listFilmsByCategorie(@Query("categorie") String categorie);
