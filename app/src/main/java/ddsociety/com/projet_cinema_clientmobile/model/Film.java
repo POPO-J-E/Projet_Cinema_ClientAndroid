@@ -94,6 +94,22 @@ public class Film implements Serializable{
 
     public String getInfos()
     {
-        return String.format("%s, %d min", (new SimpleDateFormat("yyyy")).format(getDateSortie()), getDuree());
+        System.out.println(getDateSortie());
+        return String.format("%s, %d min", getDateSortie() != null ? (new SimpleDateFormat("yyyy")).format(getDateSortie()) : "UNDEFINED", getDuree());
+    }
+
+    @Override
+    public String toString() {
+        return "Film{" +
+                "noFilm=" + noFilm +
+                ", budget=" + budget +
+                ", dateSortie=" + dateSortie +
+                ", duree=" + duree +
+                ", montantRecette=" + montantRecette +
+                ", titre='" + titre + '\'' +
+                ", realisateur=" + realisateur +
+                ", categorie=" + categorie +
+                ", personnages=" + personnages +
+                '}';
     }
 }

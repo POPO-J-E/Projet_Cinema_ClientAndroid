@@ -32,4 +32,12 @@ public class Categorie implements Serializable{
     public void setLibelleCat(String libelleCat) {
         this.libelleCat = libelleCat;
     }
+
+    @Override
+    public String toString() {
+        return "Categorie{" +
+                "codeCat='" + codeCat + '\'' +
+                ", libelleCat='" + libelleCat + '\'' +
+                '}';
+    }
 }

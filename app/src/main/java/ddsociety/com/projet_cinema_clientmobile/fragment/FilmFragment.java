@@ -8,15 +8,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import javax.inject.Inject;
+
+import ddsociety.com.projet_cinema_clientmobile.App;
 import ddsociety.com.projet_cinema_clientmobile.R;
 import ddsociety.com.projet_cinema_clientmobile.model.Film;
 import ddsociety.com.projet_cinema_clientmobile.service.CinemaService;
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,6 +36,9 @@ public class FilmFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private View view;
+
+    @Inject
+    CinemaService cinemaService;
 
     public FilmFragment() {
         // Required empty public constructor
@@ -65,6 +68,8 @@ public class FilmFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        ((App)getActivity().getApplication()).getNetComponent().inject(this);
     }
 
     @Override
@@ -83,22 +88,6 @@ public class FilmFragment extends Fragment {
     }
 
     private void loadFilm() {
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        Retrofit.Builder builder =
-                new Retrofit.Builder()
-                        .baseUrl(CinemaService.ENDPOINT)
-                        .addConverterFactory(
-                                GsonConverterFactory.create()
-                        );
-        Retrofit retrofit =
-                builder
-                        .client(
-                                httpClient.build()
-                        )
-                        .build();
-
-        // Create a very simple REST adapter which points the GitHub API endpoint.
-        CinemaService cinemaService =  retrofit.create(CinemaService.class);
         Call<Film> call;
         call = cinemaService.getFilm(noFilm);
 

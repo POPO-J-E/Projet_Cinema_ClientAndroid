@@ -20,7 +20,7 @@ public class CategorieList {
         return categories;
     }
 
-    public void setFilms(List<Categorie> categories) {
+    public void setCategories(List<Categorie> categories) {
         this.categories = categories;
     }
 }

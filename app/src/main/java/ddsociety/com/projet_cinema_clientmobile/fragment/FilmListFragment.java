@@ -15,18 +15,18 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import ddsociety.com.projet_cinema_clientmobile.App;
 import ddsociety.com.projet_cinema_clientmobile.R;
 import ddsociety.com.projet_cinema_clientmobile.api.utils.PaginatedResponse;
 import ddsociety.com.projet_cinema_clientmobile.model.Categorie;
 import ddsociety.com.projet_cinema_clientmobile.model.Film;
 import ddsociety.com.projet_cinema_clientmobile.model.list.FilmList;
 import ddsociety.com.projet_cinema_clientmobile.service.CinemaService;
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * A fragment representing a list of Items.
@@ -47,6 +47,9 @@ public class FilmListFragment extends Fragment {
     private OnListFragmentInteractionListener mListener;
     private FilmListRecyclerViewAdapter recyclerViewAdapter;
     private RecyclerView recyclerView;
+
+    @Inject
+    CinemaService cinemaService;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -76,6 +79,8 @@ public class FilmListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        ((App)getActivity().getApplication()).getNetComponent().inject(this);
+
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
             categorie = (Categorie) getArguments().getSerializable(ARG_CATEGORIE);
@@ -84,22 +89,6 @@ public class FilmListFragment extends Fragment {
 
     public void loadFilms()
     {
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        Retrofit.Builder builder =
-                new Retrofit.Builder()
-                        .baseUrl(CinemaService.ENDPOINT)
-                        .addConverterFactory(
-                                GsonConverterFactory.create()
-                        );
-        Retrofit retrofit =
-                builder
-                        .client(
-                                httpClient.build()
-                        )
-                        .build();
-
-        // Create a very simple REST adapter which points the GitHub API endpoint.
-        CinemaService cinemaService =  retrofit.create(CinemaService.class);
         Call<PaginatedResponse<FilmList>> call;
         // Fetch a list of the Github repositories.
         if(categorie != null)
@@ -131,14 +120,20 @@ public class FilmListFragment extends Fragment {
     }
 
     public void afficherFilms(List<Film> films) {
-        this.films = films;
+        if (this.films != null) {
+            this.films.clear();
+            this.films.addAll(films);
+        }
+        else {
+            this.films = films;
+        }
         if(getArguments() != null)
         {
             this.getArguments().putSerializable(ARG_FILMS, (Serializable) this.films);
         }
-//        this.recyclerViewAdapter.notifyDataSetChanged();
-        recyclerViewAdapter = new FilmListRecyclerViewAdapter(this.films, mListener);
-        recyclerView.setAdapter(recyclerViewAdapter);
+        this.recyclerViewAdapter.notifyDataSetChanged();
+//        recyclerViewAdapter = new FilmListRecyclerViewAdapter(this.films, mListener);
+//        recyclerView.setAdapter(recyclerViewAdapter);
     }
 
     @Override
@@ -159,13 +154,18 @@ public class FilmListFragment extends Fragment {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
 
+            this.films = new ArrayList<>();
+
+            recyclerViewAdapter = new FilmListRecyclerViewAdapter(this.films, mListener);
+            recyclerView.setAdapter(recyclerViewAdapter);
+
             if (getArguments() != null && savedInstanceState != null)
             {
                 afficherFilms((List<Film>)getArguments().getSerializable(ARG_FILMS));
             }
             else
             {
-                films = new ArrayList<>();
+//                films = new ArrayList<>();
                 loadFilms();
             }
         }

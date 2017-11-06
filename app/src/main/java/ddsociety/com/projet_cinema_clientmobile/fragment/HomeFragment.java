@@ -14,17 +14,17 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
+import ddsociety.com.projet_cinema_clientmobile.App;
 import ddsociety.com.projet_cinema_clientmobile.R;
 import ddsociety.com.projet_cinema_clientmobile.api.utils.PaginatedResponse;
 import ddsociety.com.projet_cinema_clientmobile.model.Categorie;
 import ddsociety.com.projet_cinema_clientmobile.model.list.CategorieList;
 import ddsociety.com.projet_cinema_clientmobile.service.CinemaService;
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,6 +34,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * create an instance of this fragment.
  */
 public class HomeFragment extends Fragment {
+
+    @Inject
+    CinemaService cinemaService;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -57,7 +60,7 @@ public class HomeFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
+        ((App)getActivity().getApplication()).getNetComponent().inject(this);
     }
 
     @Override
@@ -65,6 +68,7 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.fragment_home, container, false);
         // Inflate the layout for this fragment
+        addFilmList(null);
         loadCategories();
 
         return view;
@@ -72,22 +76,6 @@ public class HomeFragment extends Fragment {
 
     public void loadCategories()
     {
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-        Retrofit.Builder builder =
-                new Retrofit.Builder()
-                        .baseUrl(CinemaService.ENDPOINT)
-                        .addConverterFactory(
-                                GsonConverterFactory.create()
-                        );
-        Retrofit retrofit =
-                builder
-                        .client(
-                                httpClient.build()
-                        )
-                        .build();
-
-        // Create a very simple REST adapter which points the GitHub API endpoint.
-        CinemaService cinemaService =  retrofit.create(CinemaService.class);
         Call<PaginatedResponse<CategorieList>> call;
         // Fetch a list of the Github repositories.
         call = cinemaService.listCategories();

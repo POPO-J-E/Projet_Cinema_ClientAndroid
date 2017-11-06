@@ -15,8 +15,8 @@ import retrofit2.http.Query;
 
 public interface CinemaService {
 
-//    public static final String ENDPOINT = "http://192.168.1.26:8181";
-    public static final String ENDPOINT = "http://192.168.1.26:8181";
+    public static final String ENDPOINT = "http://192.168.42.21:8181";
+//    public static final String ENDPOINT = "http://192.168.1.34:8181";
 
     @GET("/films")
     Call<PaginatedResponse<FilmList>> listFilms();

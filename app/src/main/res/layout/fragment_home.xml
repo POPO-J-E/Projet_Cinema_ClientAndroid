@@ -33,13 +33,13 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0">
 
-            <fragment
-                android:id="@+id/film_fragment"
-                android:name="ddsociety.com.projet_cinema_clientmobile.fragment.FilmListFragment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                tools:layout="@layout/fragment_film_list" />
+            <!--<fragment-->
+                <!--android:id="@+id/film_fragment"-->
+                <!--android:name="ddsociety.com.projet_cinema_clientmobile.fragment.FilmListFragment"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_weight="1"-->
+                <!--tools:layout="@layout/fragment_film_list" />-->
 
         </LinearLayout>
     </ScrollView>
