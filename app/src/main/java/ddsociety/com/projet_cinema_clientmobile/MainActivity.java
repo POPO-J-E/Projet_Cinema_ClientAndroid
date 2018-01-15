@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import ddsociety.com.projet_cinema_clientmobile.fragment.FilmFormFragment;
 import ddsociety.com.projet_cinema_clientmobile.fragment.FilmFragment;
 import ddsociety.com.projet_cinema_clientmobile.fragment.FilmListFragment;
 import ddsociety.com.projet_cinema_clientmobile.fragment.HomeFragment;
@@ -25,7 +26,9 @@ import ddsociety.com.projet_cinema_clientmobile.model.Film;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         FilmListFragment.OnListFragmentInteractionListener,
-        FilmFragment.OnFragmentInteractionListener
+        FilmFragment.OnFragmentInteractionListener,
+        FilmFormFragment.OnFragmentInteractionListener,
+        HomeFragment.OnAddFilminteractionListener
 {
 
     @Override
@@ -141,10 +144,29 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void onAddFilmClickInteraction() {
+        System.out.println("add film ");
+        // Create fragment and give it an argument specifying the article it should show
+        FilmFormFragment newFragment = FilmFormFragment.newInstance(0);
+
+        replaceFragmentWithAnimation(newFragment, false);
+    }
+
+    @Override
     public void onFragmentBackInteraction() {
         this.onBackPressed();
         getSupportActionBar().setTitle(R.string.app_name);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+    }
+
+    @Override
+    public void onFilmEditInteraction(Film film) {
+        System.out.println("edit film ");
+        System.out.println(film);
+        // Create fragment and give it an argument specifying the article it should show
+        FilmFormFragment newFragment = FilmFormFragment.newInstance(film);
+
+        replaceFragmentWithAnimation(newFragment, false);
     }
 
     public void replaceFragmentWithAnimation(Fragment fragment, boolean back){

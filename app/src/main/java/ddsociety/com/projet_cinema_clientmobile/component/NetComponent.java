@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import javax.inject.Singleton;
 
 import dagger.Component;
+import ddsociety.com.projet_cinema_clientmobile.fragment.FilmFormFragment;
 import ddsociety.com.projet_cinema_clientmobile.fragment.FilmFragment;
 import ddsociety.com.projet_cinema_clientmobile.fragment.FilmListFragment;
 import ddsociety.com.projet_cinema_clientmobile.fragment.HomeFragment;
@@ -23,6 +24,7 @@ public interface NetComponent {
     void inject(HomeFragment fragment);
     void inject(FilmListFragment fragment);
     void inject(FilmFragment fragment);
+    void inject(FilmFormFragment fragment);
 
     // downstream components need these exposed
     // the method name does not matter, only the return type

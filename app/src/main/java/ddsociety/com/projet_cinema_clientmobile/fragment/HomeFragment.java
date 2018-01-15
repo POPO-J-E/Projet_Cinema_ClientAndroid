@@ -38,6 +38,8 @@ public class HomeFragment extends Fragment {
     @Inject
     CinemaService cinemaService;
 
+    private OnAddFilminteractionListener mListener;
+
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -68,10 +70,22 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view =  inflater.inflate(R.layout.fragment_home, container, false);
         // Inflate the layout for this fragment
+
+        view.findViewById(R.id.btn_home_add_film).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onAddFilmClick();
+            }
+        });
+
         addFilmList(null);
         loadCategories();
 
         return view;
+    }
+
+    private void onAddFilmClick() {
+        mListener.onAddFilmClickInteraction();
     }
 
     public void loadCategories()
@@ -122,11 +136,18 @@ public class HomeFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        if (context instanceof OnAddFilminteractionListener) {
+            mListener = (OnAddFilminteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnAddFilminteractionListener");
+        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        mListener = null;
     }
 
     @Override
@@ -157,5 +178,10 @@ public class HomeFragment extends Fragment {
                 actionBar.setHomeButtonEnabled(true);
             }
         }
+    }
+
+    public interface OnAddFilminteractionListener {
+        // TODO: Update argument type and name
+        void onAddFilmClickInteraction();
     }
 }

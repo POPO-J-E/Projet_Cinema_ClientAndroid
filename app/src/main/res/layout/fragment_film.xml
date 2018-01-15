@@ -53,6 +53,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:text="categorie" />
+
+            <TextView
+                android:id="@+id/film_realisateur"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="realisateur" />
+
+            <Button
+                android:id="@+id/film_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Editer" />
+
+            <Button
+                android:id="@+id/film_delete"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:elevation="0dp"
+                android:text="Supprimer" />
         </LinearLayout>
 
     </LinearLayout>

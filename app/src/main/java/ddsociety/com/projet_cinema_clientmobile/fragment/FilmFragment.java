@@ -80,7 +80,7 @@ public class FilmFragment extends Fragment {
 
         if (getArguments() != null) {
             noFilm = getArguments().getInt(ARG_FILM);
-
+            System.out.println(noFilm);
             loadFilm();
         }
 
@@ -90,6 +90,8 @@ public class FilmFragment extends Fragment {
     private void loadFilm() {
         Call<Film> call;
         call = cinemaService.getFilm(noFilm);
+        System.out.println(noFilm);
+        System.out.println(call);
 
         // Execute the call asynchronously. Get a positive or negative callback.
         call.enqueue(new Callback<Film>() {
@@ -97,7 +99,8 @@ public class FilmFragment extends Fragment {
             @Override
             public void onResponse(Call<Film> call, Response<Film> response) {
                 Film film = response.body();
-
+                System.out.println(response);
+                System.out.println(film);
                 if(film != null)
                 {
                     afficherFilm(film);
@@ -116,11 +119,58 @@ public class FilmFragment extends Fragment {
     public void afficherFilm(Film film)
     {
         this.film = film;
-        System.out.println(film.getTitre());
+        System.out.println(film);
 
         ((TextView)view.findViewById(R.id.film_titre)).setText(film.getTitre());
         ((TextView)view.findViewById(R.id.film_infos)).setText(film.getInfos());
         ((TextView)view.findViewById(R.id.film_categorie)).setText(film.getCategorie().getLibelleCat());
+        ((TextView)view.findViewById(R.id.film_realisateur)).setText(film.getRealisateur().getNomRea()+" "+film.getRealisateur().getPrenRea());
+        ((TextView)view.findViewById(R.id.film_edit)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickEdit();
+            }
+        });
+        ((TextView)view.findViewById(R.id.film_delete)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickDelete();
+            }
+        });
+    }
+
+    private void onClickEdit() {
+        if (mListener != null) {
+            mListener.onFilmEditInteraction(film);
+        }
+    }
+
+    private void onClickDelete() {
+        Call call;
+        call = cinemaService.deleteFilm(noFilm);
+        System.out.println(noFilm);
+        System.out.println(call);
+
+        // Execute the call asynchronously. Get a positive or negative callback.
+        call.enqueue(new Callback<Film>() {
+
+            @Override
+            public void onResponse(Call call, Response response) {
+                System.out.println(response.body());
+                if (mListener != null) {
+                    mListener.onFragmentBackInteraction();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Film> call, Throwable t) {
+                System.out.println("fail");
+                t.printStackTrace();
+                call.cancel();
+            }
+        });
+
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -159,5 +209,6 @@ public class FilmFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         void onFragmentBackInteraction();
+        void onFilmEditInteraction(Film film);
     }
 }
